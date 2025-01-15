@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { ChevronDown } from "lucide-react";
 
 type APData = {
   propertyName: string;
@@ -574,10 +575,7 @@ const FormInput = ({
   </motion.div>
 );
 
-function StudentDetails({
-  formData,
-  handleChange,
-}: StepProps<StudentData>) {
+function StudentDetails({ formData, handleChange }: StepProps<StudentData>) {
   return (
     <motion.div
       variants={formGroupVariants}
@@ -638,38 +636,62 @@ function StudentDetails({
 }
 
 function Query({ formData, handleChange }: StepProps<QueryData>) {
+  const selectVariants = {
+    initial: { scale: 1 },
+    focus: { scale: 1.02, boxShadow: "0 0 0 2px rgb(128,123,156,0.2)" },
+    tap: { scale: 0.98 },
+  };
   return (
-    <motion.div
-      variants={formGroupVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      className="space-y-6"
-    >
+    <div className="space-y-6">
       <h3 className="text-2xl font-bold text-gray-900 mb-6">Your Query</h3>
       <div className="space-y-4">
-        <FormInput
-          name="query"
-          value={formData.query}
-          onChange={handleChange}
-          placeholder="What's your query about?"
-        />
+        <div className="relative">
+          <motion.select
+            name="query"
+            value={formData.query}
+            onChange={handleChange}
+            variants={selectVariants}
+            whileFocus="focus"
+            whileTap="tap"
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 
+                       appearance-none bg-white
+                       focus:outline-none focus:border-[rgb(128,123,156)]
+                       transition-colors text-gray-700 cursor-pointer"
+          >
+            <option value="">Select a query</option>
+            <option value="Payments">Payments</option>
+            <option value="Reset Password">Reset Password</option>
+            <option value="General">General</option>
+            <option value="Lease Cancellations">Lease Cancellations</option>
+            <option value="Lease Termination">Lease Termination</option>
+            <option value="Accreditation Process">Accreditation Process</option>
+            <option value="Application Process">Application Process</option>
+          </motion.select>
+          <motion.div
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500"
+            animate={{ rotate: formData.query ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+          </motion.div>
+        </div>
+
         <motion.textarea
           name="describeQuery"
           value={formData.describeQuery}
           onChange={handleChange}
           placeholder="Please describe your query in detail..."
+          variants={selectVariants}
           whileFocus="focus"
           whileTap="tap"
-          variants={inputVariants}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
           className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 
-                     focus:outline-none focus:border-primary 
+                     focus:outline-none focus:border-[rgb(128,123,156)]
                      transition-colors placeholder-gray-400 text-gray-700
                      min-h-[120px] resize-y"
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -692,7 +714,7 @@ function APDetails({ formData, handleChange }: StepProps<APData>) {
           onChange={handleChange}
           placeholder="Property Name"
         />
-                <FormInput
+        <FormInput
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
@@ -711,7 +733,7 @@ function APDetails({ formData, handleChange }: StepProps<APData>) {
           onChange={handleChange}
           placeholder="ID Number"
         />
-                <FormInput
+        <FormInput
           name="email"
           value={formData.email}
           onChange={handleChange}
