@@ -3,6 +3,8 @@
 import { ChangeEventHandler, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 type APData = {
   propertyName: string;
@@ -74,8 +76,9 @@ export default function Home() {
       describeQuery: "",
     },
   });
-
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const options = [
     { label: "a Student", value: "Student" },
@@ -102,6 +105,143 @@ export default function Home() {
         [name]: value,
       },
     }));
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+
+    if (formData.typeOfUser === "Student") {
+      const {
+        fullName,
+        email,
+        contactNumber,
+        accommodation,
+        idNumber,
+        institution,
+        campus,
+      } = formData.Student;
+
+      if (!fullName.trim()) {
+        toast.error("Full name is required.");
+        isValid = false;
+      }
+      if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+        toast.error("Valid email is required.");
+        isValid = false;
+      }
+      if (contactNumber.length < 10) {
+        toast.error("Valid contact number is required.");
+        isValid = false;
+      }
+
+      if (idNumber.length < 13) {
+        toast.error("ID number is required.");
+        isValid = false;
+      }
+      if (!accommodation.trim()) {
+        toast.error("Accommodation is required.");
+        isValid = false;
+      }
+      if (!institution.trim()) {
+        toast.error("Institution is required.");
+        isValid = false;
+      }
+      if (!campus.trim()) {
+        toast.error("Campus is required.");
+        isValid = false;
+      }
+    }
+
+    if (formData.typeOfUser === "AP") {
+      const { propertyName, contactNumber, email, fullName, idNumber } =
+        formData.AP;
+
+      if (!propertyName.trim()) {
+        toast.error("Property name is required.");
+        isValid = false;
+      }
+      if (contactNumber.length < 10) {
+        toast.error("Valid contact number is required.");
+        isValid = false;
+      }
+
+      if (idNumber.length < 13) {
+        toast.error("ID number is required.");
+        isValid = false;
+      }
+      if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+        toast.error("Valid email is required.");
+        isValid = false;
+      }
+      if (!fullName.trim()) {
+        toast.error("Full name is required.");
+        isValid = false;
+      }
+    }
+
+    if (formData.typeOfUser === "other") {
+      const { fullName, email, contactNumber, idNumber } = formData.other;
+
+      if (!fullName.trim()) {
+        toast.error("Full name is required");
+        isValid = false;
+      }
+      if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) {
+        toast.error("Valid email is required.");
+        isValid = false;
+      }
+      if (contactNumber.length < 10) {
+        toast.error("Valid contact number is required.");
+        isValid = false;
+      }
+
+      if (idNumber.length < 13) {
+        toast.error("ID number is required.");
+        isValid = false;
+      }
+    }
+
+    const { query, describeQuery } = formData.Query;
+
+    if (!query.trim()) {
+      toast.error("Query is required.");
+      isValid = false;
+    }
+    if (!describeQuery.trim()) {
+      toast.error("Description of query is required.");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        router.push("/submitted");
+      } else {
+        const errorData = await res.json();
+      }
+    } catch (error) {
+      toast.error("Network error. Please try again later.");
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const nextStep = () => setCurrentStep((prev) => prev + 1);
@@ -344,13 +484,18 @@ export default function Home() {
                       Back
                     </motion.button>
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => console.log(formData)}
+                      whileHover={!isLoading ? { scale: 1.02 } : {}}
+                      whileTap={!isLoading ? { scale: 0.98 } : {}}
+                      onClick={() => handleSubmit()}
                       className="px-6 py-2 bg-primary text-white rounded-lg font-medium 
-                               transition-all hover:shadow-lg"
+                 transition-all hover:shadow-lg flex items-center justify-center"
+                      disabled={isLoading} // Disable the button while loading
                     >
-                      Submit
+                      {isLoading ? (
+                        <div className="loader border-t-white border-4 border-solid rounded-full w-5 h-5 animate-spin"></div>
+                      ) : (
+                        "Submit"
+                      )}
                     </motion.button>
                   </div>
                 </motion.div>
@@ -453,7 +598,7 @@ export function StudentDetails({
           name="email"
           value={formData.email}
           onChange={handleChange}
-          placeholder="Email"
+          placeholder="Email Address"
           type="email"
         />
         <FormInput
@@ -547,6 +692,13 @@ export function APDetails({ formData, handleChange }: StepProps<APData>) {
           onChange={handleChange}
           placeholder="Property Name"
         />
+                <FormInput
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleChange}
+          placeholder="Full Name"
+        />
+
         <FormInput
           name="contactNumber"
           value={formData.contactNumber}
@@ -559,11 +711,12 @@ export function APDetails({ formData, handleChange }: StepProps<APData>) {
           onChange={handleChange}
           placeholder="ID Number"
         />
-        <FormInput
-          name="propertyName"
-          value={formData.propertyName}
+                <FormInput
+          name="email"
+          value={formData.email}
           onChange={handleChange}
-          placeholder="Property Name"
+          placeholder="Email Address"
+          type="email"
         />
       </div>
     </motion.div>
@@ -591,7 +744,7 @@ export function OtherDetails({ formData, handleChange }: StepProps<OtherData>) {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          placeholder="Email"
+          placeholder="Email Address"
           type="email"
         />
         <FormInput
@@ -662,9 +815,11 @@ export function APReview({ formData }: StepProps<APData>) {
         Accommodation Provider Review
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ReviewItem label="Full Name" value={formData.fullName} />
         <ReviewItem label="Property Name" value={formData.propertyName} />
         <ReviewItem label="Contact Number" value={formData.contactNumber} />
         <ReviewItem label="ID Number" value={formData.idNumber} />
+        <ReviewItem label="Email Address" value={formData.email} />
       </div>
     </motion.div>
   );
