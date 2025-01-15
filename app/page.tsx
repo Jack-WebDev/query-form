@@ -574,7 +574,7 @@ const FormInput = ({
   </motion.div>
 );
 
-export function StudentDetails({
+function StudentDetails({
   formData,
   handleChange,
 }: StepProps<StudentData>) {
@@ -637,7 +637,7 @@ export function StudentDetails({
   );
 }
 
-export function Query({ formData, handleChange }: StepProps<QueryData>) {
+function Query({ formData, handleChange }: StepProps<QueryData>) {
   return (
     <motion.div
       variants={formGroupVariants}
@@ -673,7 +673,7 @@ export function Query({ formData, handleChange }: StepProps<QueryData>) {
   );
 }
 
-export function APDetails({ formData, handleChange }: StepProps<APData>) {
+function APDetails({ formData, handleChange }: StepProps<APData>) {
   return (
     <motion.div
       variants={formGroupVariants}
@@ -723,7 +723,7 @@ export function APDetails({ formData, handleChange }: StepProps<APData>) {
   );
 }
 
-export function OtherDetails({ formData, handleChange }: StepProps<OtherData>) {
+function OtherDetails({ formData, handleChange }: StepProps<OtherData>) {
   return (
     <motion.div
       variants={formGroupVariants}
@@ -775,7 +775,7 @@ const ReviewItem = ({ label, value }: ReviewItemProps) => (
   </motion.div>
 );
 
-export function StudentReview({ formData }: StepProps<StudentData>) {
+function StudentReview({ formData }: StepProps<StudentData>) {
   return (
     <motion.div
       variants={reviewVariants}
@@ -802,7 +802,7 @@ export function StudentReview({ formData }: StepProps<StudentData>) {
   );
 }
 
-export function APReview({ formData }: StepProps<APData>) {
+function APReview({ formData }: StepProps<APData>) {
   return (
     <motion.div
       variants={reviewVariants}
@@ -825,7 +825,7 @@ export function APReview({ formData }: StepProps<APData>) {
   );
 }
 
-export function OtherReview({ formData }: StepProps<OtherData>) {
+function OtherReview({ formData }: StepProps<OtherData>) {
   return (
     <motion.div
       variants={reviewVariants}
@@ -845,7 +845,7 @@ export function OtherReview({ formData }: StepProps<OtherData>) {
   );
 }
 
-export function QueryReview({ formData }: StepProps<QueryData>) {
+function QueryReview({ formData }: StepProps<QueryData>) {
   return (
     <motion.div
       variants={reviewVariants}
